@@ -1,10 +1,10 @@
-import { useEffect } from "react"
-import { useDishStore } from "../store/dish_store"
+import { useEffect, useState } from "react"
+import { useDishStore } from "../../store/dish_store"
 
 import { PlusIcon } from "@heroicons/react/24/solid"
 import { UserIcon, ArrowRightEndOnRectangleIcon, MagnifyingGlassIcon, ClockIcon } from "@heroicons/react/24/outline"
-import iconImage from "../assets/icon.svg"
-import { Link } from "react-router-dom"
+import iconImage from "../../assets/icon.svg"
+import { Link, useNavigate } from "react-router-dom"
 
 export const MainPage = () => {
     const { dishes, fetchDishes, loading } = useDishStore()
@@ -12,6 +12,13 @@ export const MainPage = () => {
     useEffect(() => {
         fetchDishes()
     }, [])
+
+    const navigate = useNavigate()
+
+    const getReceiptById = (id: string) => {
+        navigate(`/dishes/${id}`)
+    }
+    const [isOpen, setIsOpen] = useState(false);
 
     return (
         <div className="min-h-screen bg-[#fdf2f8]">
@@ -36,9 +43,9 @@ export const MainPage = () => {
                         </div>
 
                         <div className="flex items-center gap-5">
-                            <button className="flex items-center gap-2 rounded-[10px] w-32 h-9 bg-[#e6077a] text-white px-3">
+                            <button onClick={() => setIsOpen(true)} className="flex items-center gap-2 rounded-[10px] w-32 h-9 bg-[#e6077a] text-white px-3">
                                 <PlusIcon className="h-3 w-3" />
-                                Add Recipe
+                                Add Dish
                             </button>
                             <Link to="/register">
                                 <UserIcon className="h-4 w-4 text-black" />
@@ -70,7 +77,7 @@ export const MainPage = () => {
                 {loading && <div>Loading...</div>}
 
                 {dishes.map((dish) => (
-                    <div key={dish.id} className="bg-white rounded-xl overflow-hidden shadow hover:shadow-xl cursor-pointer">
+                    <div key={dish.id} onClick={() => getReceiptById(dish.id)} className="bg-white rounded-xl overflow-hidden shadow hover:shadow-xl cursor-pointer">
 
                         {/* IMAGE */}
                         <img
@@ -92,6 +99,54 @@ export const MainPage = () => {
                 ))}
 
             </div>
+
+            <div className="h-screen flex items-center justify-center bg-gray-100">
+            {isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg w-96 p-6 relative">
+            {/* Закрыть */}
+            <button
+              onClick={() => setIsOpen(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+            >
+              ✕
+            </button>
+
+            <h2 className="text-xl font-semibold mb-4">Добавить Receipt</h2>
+
+            {/* Пример формы */}
+            <form className="flex flex-col gap-4">
+              <input
+                type="text"
+                placeholder="Название"
+                className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+              <input
+                type="number"
+                placeholder="Сумма"
+                className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+
+              <div className="flex justify-end mt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsOpen(false)}
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition"
+                >
+                  Отмена
+                </button>
+                <button
+                  type="submit"
+                  className="ml-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+                >
+                  Сохранить
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
         </div>
     )
 }
