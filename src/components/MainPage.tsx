@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { useDishStore } from "../store/dish_store"
+import { useDishStore } from "../store/dishStore"
 
 import { PlusIcon } from "@heroicons/react/24/solid"
 import { UserIcon, ArrowRightEndOnRectangleIcon, MagnifyingGlassIcon, ClockIcon } from "@heroicons/react/24/outline"

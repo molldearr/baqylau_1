@@ -1,8 +1,8 @@
 import { Link, useNavigate } from "react-router-dom"
 import iconImage from "../../../assets/icon.svg"
 import { useEffect, useState } from "react"
-import type { UserLogin } from "../../../api/user_api"
-import { useUserStore } from "../../../store/user_store"
+import type { UserLogin } from "../../../api/userApi"
+import { useUserStore } from "../../../store/userStore"
 
 export const LoginPage = () => {
     const navigate = useNavigate()

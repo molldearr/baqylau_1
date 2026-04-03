@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { registerUserApi, type UserCreate, type User, loginUserApi, type UserLogin } from "../api/user_api"
+import { registerUserApi, type UserCreate, type User, loginUserApi, type UserLogin } from "../api/userApi"
 
 interface UserStore {
   loading: boolean
@@ -30,12 +30,12 @@ export const useUserStore = create<UserStore>((set) => ({
   },
 
   loginUser: async (userData: UserLogin) => {
-    set({loading: true})
+    set({ loading: true })
 
     try {
       const data = await loginUserApi(userData)
-        localStorage.setItem('token', data.access_token)
-        set({ userLogined: true, user: data.user })
+      localStorage.setItem('token', data.access_token)
+      set({ userLogined: true, user: data.user })
     } catch (error) {
       console.error(error)
       set({ userLogined: false })

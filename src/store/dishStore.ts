@@ -1,5 +1,5 @@
 import { create } from "zustand"
-import { getDishById, getDishes, type Dish } from "../api/dish_api"
+import { getDishById, getDishes, type Dish } from "../api/dishApi"
 
 interface DishStore {
     dishes: Dish[]

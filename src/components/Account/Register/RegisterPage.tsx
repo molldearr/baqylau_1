@@ -1,8 +1,8 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import iconImage from "../../../assets/icon.svg"
-import { useUserStore } from "../../../store/user_store"
-import { type UserCreate } from "../../../api/user_api"
+import { useUserStore } from "../../../store/userStore"
+import { type UserCreate } from "../../../api/userApi"
 
 export const RegisterPage = () => {
   const [form, setForm] = useState<UserCreate>({
