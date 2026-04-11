@@ -1,99 +1,164 @@
-import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import { ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon, ClockIcon, FireIcon } from "@heroicons/react/24/outline"
+import { useState, useEffect } from "react"
+import { useNavigate, useParams } from "react-router-dom"
 import { useDishStore } from "../../store/dishStore"
-import { ClockIcon } from "@heroicons/react/24/outline"
-import { ArrowLeftIcon, ChevronLeftIcon, ChevronRightIcon, FireIcon } from "@heroicons/react/24/solid"
 
 export const DishPage = () => {
     const { id } = useParams()
     const { currentDish, fetchDishById, loading } = useDishStore()
     const [currentIndex, setCurrentIndex] = useState(0)
 
+    const navigate = useNavigate()
+
     useEffect(() => {
         if (id) fetchDishById(id)
     }, [id])
 
+    useEffect(() => {
+        // 🔥 запрашиваем разрешение
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission()
+        }
+
+        const ws = new WebSocket("ws://localhost:8000/ws/notifications")
+
+        ws.onopen = () => {
+            console.log("WebSocket connected")
+        }
+
+        ws.onmessage = (event) => {
+            console.log("Notification:", event.data)
+
+            // 🔥 браузерное уведомление
+            if (Notification.permission === "granted") {
+                new Notification("Baqylau API", {
+                    body: event.data,
+                    icon: "/vite.svg" // можешь заменить
+                })
+            }
+        }
+
+        ws.onclose = () => {
+            console.log("WebSocket closed")
+        }
+
+        return () => ws.close()
+    }, [])
+
     if (loading || !currentDish) return <div>Loading...</div>
 
     const images = currentDish.images || []
+    const receipt = currentDish.receipt
 
-    const prevImage = () => {
-        setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))
-    }
-
-    const nextImage = () => {
-        setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
+    const backToRecipes = () => {
+        navigate('/')
     }
 
     return (
         <div className="min-h-screen bg-[#fdf2f8] p-10">
-            <div className="max-w-3xl mx-auto rounded-xl shadow overflow-hidden">
-                <span className="font-bold text-sm flex items-center gap-1 text-[#e7007a] pb-4">
-                    <ArrowLeftIcon className="h-4 w-4" />
-                    Back to Recipes
-                </span>
-                <div className="max-w-3xl mx-auto rounded-xl shadow overflow-hidden relative">
 
-                    {/* CAROUSEL */}
-                    {images.length > 0 && (
-                        <div className="relative">
-                            <img
-                                src={images[currentIndex].image_path}
-                                className="w-full h-64 object-cover"
-                                alt={`Dish ${currentIndex + 1}`}
-                            />
+            <div className="max-w-4xl mx-auto bg-white rounded-xl shadow overflow-hidden">
 
-                            {/* Left Arrow */}
-                            <button
-                                onClick={prevImage}
-                                className="absolute top-1/2 left-2 -translate-y-1/2 bg-white bg-opacity-70 rounded-full p-2 hover:bg-opacity-100 transition"
-                            >
-                                <ChevronLeftIcon className="h-5 w-5 text-gray-800" />
-                            </button>
+                {/* BACK */}
+                <div className="p-4 border-b">
+                    <span onClick={backToRecipes} className="font-bold text-sm flex items-center gap-1 text-[#e7007a] cursor-pointer">
+                        <ArrowLeftIcon className="h-4 w-4" />
+                        Back to Recipes
+                    </span>
+                </div>
 
-                            {/* Right Arrow */}
-                            <button
-                                onClick={nextImage}
-                                className="absolute top-1/2 right-2 -translate-y-1/2 bg-white bg-opacity-70 rounded-full p-2 hover:bg-opacity-100 transition"
-                            >
-                                <ChevronRightIcon className="h-5 w-5 text-gray-800" />
-                            </button>
+                {/* IMAGE CAROUSEL */}
+                {images.length > 0 && (
+                    <div className="relative">
+                        <img
+                            src={images[currentIndex].image_path}
+                            className="w-full h-72 object-cover"
+                        />
 
-                            {/* Dots */}
-                            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2">
-                                {images.map((_, idx) => (
-                                    <span
-                                        key={idx}
-                                        className={`h-2 w-2 rounded-full ${idx === currentIndex ? "bg-gray-800" : "bg-gray-400"}`}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                        <button onClick={() =>
+                            setCurrentIndex(prev =>
+                                prev === 0 ? images.length - 1 : prev - 1
+                            )
+                        } className="absolute left-2 top-1/2 -translate-y-1/2 bg-white p-2 rounded-full">
+                            <ChevronLeftIcon className="h-5 w-5" />
+                        </button>
 
-                    <div className="p-6">
-                        <h1 className="text-2xl font-bold mb-2">{currentDish.name}</h1>
-                        <p className="text-gray-700">{currentDish.description}</p>
+                        <button onClick={() =>
+                            setCurrentIndex(prev =>
+                                prev === images.length - 1 ? 0 : prev + 1
+                            )
+                        } className="absolute right-2 top-1/2 -translate-y-1/2 bg-white p-2 rounded-full">
+                            <ChevronRightIcon className="h-5 w-5" />
+                        </button>
+                    </div>
+                )}
+
+                {/* CONTENT */}
+                <div className="p-6 space-y-6">
+
+                    {/* TITLE */}
+                    <div>
+                        <h1 className="text-3xl font-bold">{currentDish.name}</h1>
+                        <p className="text-gray-600 mt-2">
+                            {currentDish.description}
+                        </p>
                     </div>
 
-                    <div className="px-6 flex items-center gap-3 p-4">
-                        <div className="flex gap-2 text-red-700 bg-yellow-200 p-2 rounded-2xl">
-                            <span>Medium</span>
-                        </div>
-                        <div className="flex gap-2 text-gray-400">
+                    {/* KITCHEN */}
+                    <div className="inline-block bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-sm">
+                        🍽 {currentDish.kitchen?.title}
+                    </div>
+
+                    {/* RECEIPT INFO */}
+                    <div className="flex items-center gap-6 text-gray-600">
+
+                        <div className="flex items-center gap-2">
                             <ClockIcon className="h-5 w-5" />
-                            <span>{currentDish.receipt?.cooking_time} min</span>
+                            <span>{receipt?.cooking_time} min</span>
                         </div>
-                        <div className="flex text-gray-500">
-                            <FireIcon className="h-5 w-5" />
-                            {currentDish.receipt?.calorie}
+
+                        <div className="flex items-center gap-2">
+                            <FireIcon className="h-5 w-5 text-red-500" />
+                            <span>{receipt?.calorie} kcal</span>
+                        </div>
+
+                        <div className="bg-yellow-200 px-3 py-1 rounded-xl text-sm">
+                            {currentDish.difficulty?.name}
                         </div>
                     </div>
 
-                    {/* <div className="">
-                        {currentDish.receipt..map((_, idx) => (
-                        ))}
-                    </div> */}
+                    {/* INGREDIENTS */}
+                    <div>
+                        <h2 className="text-xl font-semibold mb-2">
+                            Ingredients
+                        </h2>
+
+                        <div className="grid grid-cols-2 gap-2">
+                            {receipt?.receipt_ingredients?.map((item: any) => (
+                                <div
+                                    key={item.id}
+                                    className="flex justify-between bg-gray-100 p-2 rounded"
+                                >
+                                    <span>{item.ingredient.title}</span>
+                                    <span className="text-gray-500">
+                                        {item.quantity}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* INSTRUCTIONS */}
+                    <div>
+                        <h2 className="text-xl font-semibold mb-2">
+                            Instructions
+                        </h2>
+
+                        <p className="whitespace-pre-line text-gray-700 leading-relaxed">
+                            {receipt?.instructions}
+                        </p>
+                    </div>
+
                 </div>
             </div>
         </div>
