@@ -1,10 +1,12 @@
 import { useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import iconImage from "../../../assets/icon.svg"
-import { useUserStore } from "../../../store/userStore"
+import { useAuthStore } from "../../../store/authStore"
 import { type UserCreate } from "../../../api/userApi"
 
 export const RegisterPage = () => {
+  const navigate = useNavigate()
+
   const [form, setForm] = useState<UserCreate>({
     first_name: "",
     last_name: "",
@@ -12,7 +14,7 @@ export const RegisterPage = () => {
     password: "",
   })
 
-  const { registerUser, loading, userRegistered } = useUserStore()
+  const { register, loading } = useAuthStore()
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
@@ -20,7 +22,15 @@ export const RegisterPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    await registerUser(form)
+
+    const success = await register(form)
+
+    if (success) {
+      alert("Регистрация успешна")
+      navigate("/login")
+    } else {
+      alert("Ошибка регистрации")
+    }
   }
 
   return (
@@ -29,7 +39,7 @@ export const RegisterPage = () => {
         <button className="bg-[#ef1d8a] rounded-[10px] w-10 h-10 flex items-center justify-center">
           <img src={iconImage} className="h-6 w-6" />
         </button>
-        <span className="font-bold">RecipeHub</span>
+        <span className="font-bold">Recipe&Dear</span>
       </div>
 
       <form
@@ -37,7 +47,7 @@ export const RegisterPage = () => {
         className="flex flex-col bg-white p-6 rounded-2xl gap-3 w-full max-w-md"
       >
         <div className="flex flex-col items-center gap-3">
-          <span className="text-[#892d72] font-[600] text-2xl">Sign up</span>
+          <span className="text-[#892d72] font-[600] text-2xl">𝐒𝐢𝐧𝐠 𝐮𝐩⋆.𐙚 ̊</span>
         </div>
 
         <div className="flex flex-col gap-3">
@@ -94,12 +104,8 @@ export const RegisterPage = () => {
             disabled={loading}
             className="bg-[#e60076] rounded-2xl text-white w-full p-3 mt-2"
           >
-            {loading ? "Registering..." : "Register"}
+            {loading ? "Registering..." : "Register⋆.𐙚 ̊"}
           </button>
-
-          {userRegistered && (
-            <span className="text-green-600 mt-2 text-center">User successfully registered!</span>
-          )}
 
           <div className="flex gap-3 justify-center mt-2">
             <span>Already have an account?</span>

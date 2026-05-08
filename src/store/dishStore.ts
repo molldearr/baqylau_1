@@ -3,6 +3,7 @@ import {
     getDishById,
     getDishes,
     searchDishApi,
+    createDishApi,
     type Dish
 } from "../api/dishApi"
 
@@ -11,13 +12,22 @@ interface DishStore {
     suggestions: Dish[]
     loading: boolean
     currentDish?: Dish
+    
 
     fetchDishes: () => Promise<void>
+    
     fetchDishById: (id: string) => Promise<void>
 
     searchDish: (searchWord: string) => Promise<void>
     searchDishAutocomplete: (searchWord: string) => Promise<void>
+    createDish: (data: {
+    name: string
+    description: string
+    difficulty_id: string | null
+    }) => Promise<void>
     clearSuggestions: () => void
+
+    
 }
 
 export const useDishStore = create<DishStore>((set) => ({
@@ -72,6 +82,15 @@ export const useDishStore = create<DishStore>((set) => ({
             console.log(error)
         }
     },
-
+    createDish: async (data) => {
+        set({ loading: true })
+        try {
+            await createDishApi(data)
+            const updatedDishes = await getDishes()
+            set({ dishes: updatedDishes })
+        } finally {
+            set({ loading: false })
+        }
+    },
     clearSuggestions: () => set({ suggestions: [] })
 }))

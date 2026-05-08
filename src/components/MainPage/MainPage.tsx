@@ -22,9 +22,9 @@ export const MainPage = () => {
 
     const navigate = useNavigate()
 
-    // useEffect(() => {
-    //     fetchDishes()
-    // }, [])
+    useEffect(() => {
+        fetchDishes()
+    }, [])
 
     const handleSelect = (word: string) => {
         searchDish(word)
@@ -53,16 +53,16 @@ export const MainPage = () => {
             {/* SEARCH */}
             <div className="px-10 py-8 relative">
                 <div className="text-3xl font-bold mb-4">
-                    Dámli retseptterdi zertteńiz
+                    Explore delicious recipes
                 </div>
 
-                <div className="flex items-center bg-gray-100 px-3 h-12 rounded-lg">
+                <div className="flex items-center bg-gray-100 px-3 h-12 w-3xl rounded-lg">
                     <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
 
                     <input
                         value={query}
                         className="bg-transparent ml-2 outline-none w-full"
-                        placeholder="Retseptterdi izdeńiz"
+                        placeholder="Search recipes"
                         onChange={(e) => setQuery(e.target.value)}
                     />
                 </div>

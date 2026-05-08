@@ -1,4 +1,3 @@
-import type { DiffEntry } from "util"
 import { apiClient } from "./axios"
 
 export interface DishImage {
@@ -9,7 +8,7 @@ export interface DishImage {
 export interface Ingredient {
     id: string
     title: string
-}
+}   
 
 export interface ReceiptIngredient {
     id: string
@@ -66,4 +65,17 @@ export const getDishById = async (id: string): Promise<Dish> => {
 export const searchDishApi = async (searchWord: string): Promise<Dish[]> => {
     const response = await apiClient.get(`/dishes/search?search_word=${searchWord}`)
     return response.data
+}
+
+export const createDishApi = async (data: {
+  name: string
+  description: string
+  difficulty_id: string | null
+  cooking_time?: number | null
+  calorie?: number | null
+  ingredients?: string
+  instructions?: string
+}) => {
+  const response = await apiClient.post("/dishes/new", data)
+  return response.data
 }
